@@ -7,6 +7,7 @@ const refsForm = {
   btnSubmitSearch: document.querySelector('button[type="submit"]'),
 };
 const gallery = document.querySelector('.gallery');
+const btnLoadMore = document.querySelector('.load-more');
 
 refsForm.form.addEventListener('submit', async event => {
   event.preventDefault();
@@ -14,9 +15,11 @@ refsForm.form.addEventListener('submit', async event => {
     if (refsForm.inputSearch.value.trim() === '') {
       return;
     }
-    const response = await fetchPhotos(refsForm.inputSearch.value.trim());
+    let page = 1;
+    const response = await fetchPhotos(refsForm.inputSearch.value.trim(), page);
     const result = await response.data;
     const data = await result.hits;
+    btnLoadMore.classList.remove('is-hidden');
 
     console.log(data);
     if (data.length === 0) {
@@ -28,6 +31,17 @@ refsForm.form.addEventListener('submit', async event => {
       clearGallery();
       renderPhotoCard(data);
     }
+
+    btnLoadMore.addEventListener('click', async () => {
+      page += 1;
+      const response = await fetchPhotos(
+        refsForm.inputSearch.value.trim(),
+        page
+      );
+      const result = await response.data;
+      const data = await result.hits;
+      renderPhotoCard(data);
+    });
   } catch {}
 });
 

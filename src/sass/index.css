@@ -21,4 +21,12 @@
      object-fit: cover;
   -o-object-position: center;
      object-position: center;
+}
+
+.load-more {
+  margin-top: 50px;
+}
+
+.is-hidden {
+  display: none;
 }/*# sourceMappingURL=index.css.map */
