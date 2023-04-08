@@ -1,6 +1,8 @@
 .gallery {
+  margin-top: 80px;
   display: flex;
   flex-wrap: wrap;
+  position: absolute;
 }
 
 .photo-card {
@@ -20,9 +22,7 @@
     object-position: center;
   }
 }
+
 .load-more {
   margin-top: 50px;
-}
-.is-hidden {
-  display: none;
 }

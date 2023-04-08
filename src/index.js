@@ -13,6 +13,8 @@ refsForm.form.addEventListener('submit', async event => {
   event.preventDefault();
   try {
     if (refsForm.inputSearch.value.trim() === '') {
+      clearGallery();
+      btnLoadMore.classList.add('is-hidden');
       return;
     }
     let page = 1;
@@ -21,12 +23,15 @@ refsForm.form.addEventListener('submit', async event => {
     const data = await result.hits;
     btnLoadMore.classList.remove('is-hidden');
 
+    console.log(result);
     console.log(data);
     if (data.length === 0) {
       clearGallery();
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
+      btnLoadMore.classList.add('is-hidden');
+      return;
     } else {
       clearGallery();
       renderPhotoCard(data);
@@ -42,7 +47,9 @@ refsForm.form.addEventListener('submit', async event => {
       const data = await result.hits;
       renderPhotoCard(data);
     });
-  } catch {}
+  } catch {
+    btnLoadMore.classList.add('is-hidden');
+  }
 });
 
 function renderPhotoCard(data) {
