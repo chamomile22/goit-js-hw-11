@@ -8,6 +8,7 @@ const refsForm = {
 };
 const gallery = document.querySelector('.gallery');
 const btnLoadMore = document.querySelector('.load-more');
+let page = 1;
 
 refsForm.form.addEventListener('submit', async event => {
   event.preventDefault();
@@ -17,7 +18,7 @@ refsForm.form.addEventListener('submit', async event => {
       btnLoadMore.classList.add('is-hidden');
       return;
     }
-    let page = 1;
+    page = 1;
     const response = await fetchPhotos(refsForm.inputSearch.value.trim(), page);
     const result = await response.data;
     const data = await result.hits;
@@ -36,6 +37,10 @@ refsForm.form.addEventListener('submit', async event => {
       clearGallery();
       renderPhotoCard(data);
     }
+    if (result.totalHits <= page * data.length) {
+      btnLoadMore.classList.add('is-hidden');
+      Notiflix.Notify.info("We're sorry, but it's all from search results.");
+    }
 
     btnLoadMore.addEventListener('click', async () => {
       page += 1;
@@ -46,6 +51,12 @@ refsForm.form.addEventListener('submit', async event => {
       const result = await response.data;
       const data = await result.hits;
       renderPhotoCard(data);
+      if (result.totalHits <= page * data.length) {
+        btnLoadMore.classList.add('is-hidden');
+        Notiflix.Notify.info(
+          "We're sorry, but you've reached the end of search results."
+        );
+      }
     });
   } catch {
     btnLoadMore.classList.add('is-hidden');
@@ -56,23 +67,23 @@ function renderPhotoCard(data) {
   const markup = data
     .map(el => {
       return `<div class="photo-card">
-  <div class="photo"><img src="${el.webformatURL}" alt="${el.tags}" loading="lazy" data-source="${el.largeImageURL}/></div>
+  <div class="photo"><img src="${el.webformatURL}" alt="${el.tags}" loading="lazy" data-source="${el.largeImageURL}"/></div>
   <div class="info">
     <p class="info-item">
-      <b>Likes</b>
-      ${el.likes}
+      <span class="info-content--bold">Likes</span>
+      <span class="info-content">${el.likes}</span>
     </p>
     <p class="info-item">
-      <b>Views</b>
-      ${el.views}
+      <span class="info-content--bold">Views</span>
+      <span class="info-content">${el.views}</span>
     </p>
     <p class="info-item">
-      <b>Comments</b>
-      ${el.comments}
+      <span class="info-content--bold">Comments</span>
+      <span class="info-content">${el.comments}</span>
     </p>
     <p class="info-item">
-      <b>Downloads</b>
-      ${el.downloads}
+      <span class="info-content--bold">Downloads</span>
+      <span class="info-content">${el.downloads}</span>
     </p>
   </div>
 </div>`;
