@@ -9,9 +9,11 @@ const refsForm = {
 const gallery = document.querySelector('.gallery');
 const btnLoadMore = document.querySelector('.load-more');
 let page = 1;
+let renderedElements = 0;
 
 refsForm.form.addEventListener('submit', async event => {
   event.preventDefault();
+  renderedElements = 0;
   try {
     if (refsForm.inputSearch.value.trim() === '') {
       clearGallery();
@@ -24,8 +26,6 @@ refsForm.form.addEventListener('submit', async event => {
     const data = await result.hits;
     btnLoadMore.classList.remove('is-hidden');
 
-    console.log(result);
-    console.log(data);
     if (data.length === 0) {
       clearGallery();
       Notiflix.Notify.failure(
@@ -36,31 +36,33 @@ refsForm.form.addEventListener('submit', async event => {
     } else {
       clearGallery();
       renderPhotoCard(data);
+      renderedElements += data.length;
     }
-    if (result.totalHits <= page * data.length) {
+    if (result.totalHits <= renderedElements) {
       btnLoadMore.classList.add('is-hidden');
       Notiflix.Notify.info("We're sorry, but it's all from search results.");
       return;
     }
+  } catch {
+    Notiflix.Notify.failure('Something went wrong... Please try again later.');
+  }
+});
 
-    btnLoadMore.addEventListener('click', async () => {
-      page += 1;
-      const response = await fetchPhotos(
-        refsForm.inputSearch.value.trim(),
-        page
-      );
-      const result = await response.data;
-      const data = await result.hits;
-      renderPhotoCard(data);
-      if (result.totalHits <= page * data.length) {
-        Notiflix.Notify.info(
-          "We're sorry, but you've reached the end of search results."
-        );
-        btnLoadMore.classList.add('is-hidden');
-        return;
-      }
-    });
-  } catch {}
+btnLoadMore.addEventListener('click', async () => {
+  page += 1;
+  const response = await fetchPhotos(refsForm.inputSearch.value.trim(), page);
+  const result = await response.data;
+  const data = await result.hits;
+  renderPhotoCard(data);
+  renderedElements += data.length;
+
+  if (result.totalHits <= renderedElements) {
+    Notiflix.Notify.info(
+      "We're sorry, but you've reached the end of search results."
+    );
+    btnLoadMore.classList.add('is-hidden');
+    return;
+  }
 });
 
 function renderPhotoCard(data) {
